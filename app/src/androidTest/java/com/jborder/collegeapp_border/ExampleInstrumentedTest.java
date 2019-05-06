@@ -1,4 +1,4 @@
-package com.linburgtech.collegeapp_linburg2019;
+package com.jborder.collegeapp_border;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

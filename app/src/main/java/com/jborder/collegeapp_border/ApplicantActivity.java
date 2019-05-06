@@ -1,10 +1,14 @@
-package com.linburgtech.collegeapp_linburg2019;
+package com.jborder.collegeapp_border;
 
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,14 +19,45 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+
 public class ApplicantActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private Fragment contentFragment = null;
+    private String MY_EMAIL_ADDRESS = "marinemaster00@gmail.com";
+    public static String EMAIL_PREF;
 
-    Fragment contentFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences =
+                this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(EMAIL_PREF, MY_EMAIL_ADDRESS);
+        editor.commit();
+        final String APP_ID = getString(R.string.APP_ID);
+        final String API_KEY = getString(R.string.API_KEY);
+        Backendless.initApp(this, APP_ID, API_KEY);
+
+        BackendlessUser user = new BackendlessUser();
+        user.setEmail("test@gmail.com");
+        user.setPassword("test");
+
+        Backendless.UserService.register(user, new AsyncCallback<BackendlessUser>(){
+            @Override
+            public void handleResponse(BackendlessUser backendlessUser){
+                Log.i( "User ", backendlessUser.getEmail() + " successfully registered" );
+            }
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                Log.e( "Backendless error", backendlessFault.getMessage());
+            }
+        });
+
         setContentView(R.layout.activity_applicant);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -44,8 +79,6 @@ public class ApplicantActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-
     }
 
     @Override
@@ -87,11 +120,11 @@ public class ApplicantActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.family_member) {
-            contentFragment = new FamilyMemberFragment();
+            contentFragment = new FamilyListFragment();
         } else if (id == R.id.profile) {
             contentFragment = new ProfileFragment();
         }
-        if (contentFragment != null) {
+        if (contentFragment != null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, contentFragment);
             ft.commit();

@@ -1,4 +1,4 @@
-package com.linburgtech.collegeapp_linburg2019;
+package com.jborder.collegeapp_border;
 
 import android.app.Activity;
 import android.app.AlertDialog;
